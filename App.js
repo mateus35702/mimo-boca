@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     color: 'white',
-    fontSize: 30,
+    fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 16,
   },
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
  marginBottom: 20,
   },
   title: {
-    fontSize: 25,
+    fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
   },
