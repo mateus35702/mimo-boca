@@ -1,82 +1,278 @@
+import React, { useState, useRef, useEffect } from 'react';
+import {
+  SafeAreaView,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  TextInput,
+  Alert,
+  Animated,
+  useWindowDimensions,
+  Platform,
+} from 'react-native';
+
+const paginas = ['home', 'sobre', 'contato', 'servicos'];
+
+export default function App() {
+  const [pagina, setPagina] = useState('home');
+  const underlineAnim = useRef(new Animated.Value(0)).current;
+  const lightAnim = useRef(new Animated.Value(0)).current;
+  const { width: screenWidth } = useWindowDimensions();
+
+  const index = paginas.indexOf(pagina);
+  const buttonWidth = screenWidth / paginas.length;
+
+  // Move a underline para o botão ativo, animando o deslocamento
+  useEffect(() => {
+    Animated.timing(underlineAnim, {
+      toValue: index * buttonWidth,
+      duration: 400,
+      useNativeDriver: false,
+    }).start();
+  }, [pagina, buttonWidth]);
+
+  // Reinicia animação da luz ao redimensionar tela ou trocar aba
+  useEffect(() => {
+    lightAnim.setValue(0);
+    Animated.loop(
+      Animated.timing(lightAnim, {
+        toValue: 1,
+        duration: 1500,
+        useNativeDriver: false,
+      })
+    ).start();
+  }, [buttonWidth]);
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <Header
+        pagina={pagina}
+        setPagina={setPagina}
+        underlineAnim={underlineAnim}
+        buttonWidth={buttonWidth}
+        lightAnim={lightAnim}
+        screenWidth={screenWidth}
+      />
+      <ScrollView contentContainerStyle={styles.content}>
+        {pagina === 'home' && <Home />}
+        {pagina === 'sobre' && <Sobre />}
+        {pagina === 'contato' && <Contato />}
+        {pagina === 'servicos' && <Servicos />}
+      </ScrollView>
+      <Footer />
+    </SafeAreaView>
+  );
+}
+
+function Header({ pagina, setPagina, underlineAnim, buttonWidth, lightAnim, screenWidth }) {
+  return (
+    <View style={styles.header}>
+      <Text style={styles.headerTitle}>Mimo Boca</Text>
+      <View style={styles.navWrapper}>
+        <View style={styles.nav}>
+          {paginas.map((p) => (
+            <TouchableOpacity
+              key={p}
+              style={styles.navButton}
+              onPress={() => setPagina(p)}
+              activeOpacity={0.7}
+            >
+              <Text
+                style={[
+                  styles.navButtonText,
+                  pagina === p && styles.navButtonTextActive,
+                ]}
+              >
+                {p.charAt(0).toUpperCase() + p.slice(1)}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Underline animada responsiva */}
+        <Animated.View
+          style={[
+            styles.underline,
+            {
+              width: buttonWidth * 0.8,
+              left: underlineAnim.interpolate({
+                inputRange: [0, screenWidth - buttonWidth],
+                outputRange: [buttonWidth * 0.1, screenWidth - buttonWidth + buttonWidth * 0.1],
+                extrapolate: 'clamp',
+              }),
+            },
+          ]}
+        >
+          <View style={styles.underlineBackground} />
+          <Animated.View
+            style={[
+              styles.runningLight,
+              {
+                left: lightAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ['-30%', '100%'],
+                }),
+              },
+            ]}
+          />
+        </Animated.View>
+      </View>
+    </View>
+  );
+}
+
+// Páginas
+function Home() {
+  return (
+    <View style={styles.section}>
+      <Text style={styles.title}>Bem-vindo a Mimo Boca</Text>
+      <Text style={{color: '#ddd'}}>A boca mais doce da quebrada</Text>
+    </View>
+  );
+}
+
+function Sobre() {
+  return (
+    <View style={styles.section}>
+      <Text style={styles.title}>Sobre nós</Text>
+      <Text style={{color: '#ddd'}}>
+        Fundada em 2025, temos como missão proporcionar a melhor experiência
+        para os nossos clientes.
+      </Text>
+    </View>
+  );
+}
+
+function Servicos() {
+  return (
+    <View style={styles.section}>
+      <Text style={styles.title}>Nossos serviços</Text>
+      <Text style={{color: '#ddd'}}>Limpeza de boca</Text>
+    </View>
+  );
+}
+
+function Contato() {
+  const [nome, setNome] = useState('');
+  const [email, setEmail] = useState('');
+  const [mensagem, setMensagem] = useState('');
+
+  function enviar() {
+    if (!nome || !email || !mensagem) {
+      Alert.alert('Erro', 'Preencha todos os campos');
+      return;
+    }
+    Alert.alert(
+      'Mensagem enviada com sucesso',
+      `Obrigado, ${nome}! Retornaremos em breve.`
+    );
+    setNome('');
+    setEmail('');
+    setMensagem('');
+  }
+
+  return (
+    <View style={styles.section}>
+      <Text style={styles.title}>Contato</Text>
+      <TextInput
+        placeholder="Nome"
+        value={nome}
+        onChangeText={setNome}
+        style={styles.input}
+      />
+      <TextInput
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        style={styles.input}
+        keyboardType="email-address"
+      />
+      <TextInput
+        placeholder="Mensagem"
+        value={mensagem}
+        onChangeText={setMensagem}
+        style={styles.input}
+        multiline
+      />
+      <TouchableOpacity style={styles.button} onPress={enviar}>
+        <Text style={styles.buttonText}>Enviar</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+function Footer() {
+  return (
+    <View style={styles.footer}>
+      <Text style={{ color: 'white' }}>
+        © 2025 Mimo Boca. Todos os direitos reservados.
+      </Text>
+    </View>
+  );
+}
+
+// Estilos
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // Gradiente para web: pode usar expo-linear-gradient ou css para web
-    backgroundColor: '#16192e',
-    minHeight: '100vh',
+    backgroundColor: '#0d0d0d',
+    minHeight: '100vh', // Para web!
   },
+
   header: {
     backgroundColor: '#1a1a2e',
     paddingTop: 50,
-    paddingBottom: 20,
+    paddingBottom: 10,
     paddingHorizontal: 20,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-    shadowColor: '#00f0ff',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.2,
-    shadowRadius: 18,
-    elevation: 10,
   },
   headerTitle: {
     color: '#fff',
-    fontSize: 30,
+    fontSize: 26,
     fontWeight: 'bold',
-    letterSpacing: 2,
-    marginBottom: 15,
+    marginBottom: 10,
     alignSelf: 'center',
-    textShadowColor: '#00f0ff',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 20,
   },
   navWrapper: {
     position: 'relative',
-    marginVertical: 10,
   },
   nav: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    gap: 12,
   },
   navButton: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: 12,
-    borderRadius: 12,
-    transitionProperty: 'background',
-    transitionDuration: '0.2s',
+    paddingVertical: 10,
+    cursor: Platform.OS === 'web' ? 'pointer' : undefined,
   },
   navButtonText: {
-    color: '#888',
-    fontSize: 18,
-    fontWeight: '600',
-    letterSpacing: 1,
-    userSelect: 'none',
+    color: '#666',
+    fontSize: 16,
+    userSelect: Platform.OS === 'web' ? 'none' : undefined,
   },
   navButtonTextActive: {
     color: '#00f0ff',
     fontWeight: 'bold',
     textShadowColor: '#00f0ff',
     textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 14,
+    textShadowRadius: 10,
   },
+
   underline: {
     position: 'absolute',
-    height: 6,
+    height: 4,
     bottom: 0,
-    borderRadius: 3,
+    borderRadius: 2,
     overflow: 'hidden',
-    backgroundColor: 'transparent',
-    shadowColor: '#00f0ff',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.6,
-    shadowRadius: 10,
-    elevation: 8,
+    transitionProperty: Platform.OS === 'web' ? 'left, width' : undefined,
+    transitionDuration: Platform.OS === 'web' ? '0.4s' : undefined,
   },
   underlineBackground: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: '#00f0ff',
-    opacity: 0.4,
+    opacity: 0.3,
   },
   runningLight: {
     position: 'absolute',
@@ -84,79 +280,51 @@ const styles = StyleSheet.create({
     width: '30%',
     height: '100%',
     backgroundColor: '#ffffff',
-    opacity: 0.8,
-    borderRadius: 3,
+    opacity: 0.6,
+    borderRadius: 2,
     shadowColor: '#00f0ff',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
-    shadowRadius: 18,
-    elevation: 14,
+    shadowOpacity: 0.9,
+    shadowRadius: 10,
+    elevation: 10,
   },
+
   content: {
-    padding: 30,
+    padding: 20,
     flexGrow: 1,
-    gap: 22,
   },
   section: {
-    marginBottom: 30,
-    backgroundColor: '#22253c',
-    borderRadius: 18,
-    padding: 22,
-    shadowColor: '#00f0ff',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.18,
-    shadowRadius: 8,
-    elevation: 4,
+    marginBottom: 20,
   },
   title: {
-    fontSize: 23,
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 12,
+    marginBottom: 10,
     color: '#fff',
-    letterSpacing: 1,
-    textShadowColor: '#00f0ff',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 14,
   },
   input: {
-    backgroundColor: 'rgba(255,255,255,0.95)',
+    backgroundColor: 'white',
     borderWidth: 1,
-    borderColor: '#00f0ff',
-    borderRadius: 7,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    marginBottom: 18,
-    fontSize: 16,
-    color: '#16192e',
+    borderColor: '#ccc',
+    borderRadius: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginBottom: 15,
   },
   button: {
-    backgroundColor: '#00f0ff',
-    paddingVertical: 10,
-    borderRadius: 8,
+    backgroundColor: '#004080',
+    paddingVertical: 8,
+    borderRadius: 6,
     alignItems: 'center',
-    shadowColor: '#00f0ff',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 8,
-    elevation: 8,
   },
   buttonText: {
-    color: '#16192e',
+    color: 'white',
     fontWeight: 'bold',
-    fontSize: 18,
-    letterSpacing: 1,
+    fontSize: 16,
   },
   footer: {
-    backgroundColor: '#22253c',
-    padding: 18,
+    backgroundColor: '#00264d',
+    padding: 15,
     alignItems: 'center',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    marginTop: 30,
-    shadowColor: '#00f0ff',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 2,
   },
 });
