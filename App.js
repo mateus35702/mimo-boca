@@ -18,35 +18,20 @@ const screenWidth = Dimensions.get('window').width;
 export default function App() {
   const [pagina, setPagina] = useState('home');
   const underlineAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(1)).current;
   const lightAnim = useRef(new Animated.Value(0)).current;
 
   const index = paginas.indexOf(pagina);
   const buttonWidth = screenWidth / paginas.length;
 
-  // Mover underline e aplicar "pulse"
+  // Move a underline para o botão ativo
   useEffect(() => {
-    Animated.parallel([
-      Animated.spring(underlineAnim, {
-        toValue: index * buttonWidth,
-        useNativeDriver: false,
-      }),
-      Animated.sequence([
-        Animated.timing(scaleAnim, {
-          toValue: 1.4,
-          duration: 150,
-          useNativeDriver: false,
-        }),
-        Animated.timing(scaleAnim, {
-          toValue: 1,
-          duration: 150,
-          useNativeDriver: false,
-        }),
-      ]),
-    ]).start();
+    Animated.spring(underlineAnim, {
+      toValue: index * buttonWidth,
+      useNativeDriver: false,
+    }).start();
   }, [pagina]);
 
-  // Luz correndo dentro da underline
+  // Animação loop da luz correndo dentro da underline
   useEffect(() => {
     Animated.loop(
       Animated.timing(lightAnim, {
@@ -64,7 +49,6 @@ export default function App() {
         setPagina={setPagina}
         underlineAnim={underlineAnim}
         buttonWidth={buttonWidth}
-        scaleAnim={scaleAnim}
         lightAnim={lightAnim}
       />
       <ScrollView contentContainerStyle={styles.content}>
@@ -78,7 +62,7 @@ export default function App() {
   );
 }
 
-function Header({ pagina, setPagina, underlineAnim, buttonWidth, scaleAnim, lightAnim }) {
+function Header({ pagina, setPagina, underlineAnim, buttonWidth, lightAnim }) {
   return (
     <View style={styles.header}>
       <Text style={styles.headerTitle}>Mimo Boca</Text>
@@ -103,18 +87,20 @@ function Header({ pagina, setPagina, underlineAnim, buttonWidth, scaleAnim, ligh
           ))}
         </View>
 
-        {/* Underline com luz correndo */}
+        {/* Underline animada */}
         <Animated.View
           style={[
-            styles.underlineWrapper,
+            styles.underline,
             {
               width: buttonWidth * 0.8,
               left: underlineAnim + buttonWidth * 0.1,
-              transform: [{ scaleX: scaleAnim }],
             },
           ]}
         >
-          <View style={styles.underlineBase} />
+          {/* Fundo azul translúcido */}
+          <View style={styles.underlineBackground} />
+
+          {/* Linha branca correndo */}
           <Animated.View
             style={[
               styles.runningLight,
@@ -137,7 +123,7 @@ function Home() {
   return (
     <View style={styles.section}>
       <Text style={styles.title}>Bem-vindo a Mimo Boca</Text>
-      <Text>A boca mais doce da quebrada</Text>
+      <Text style={{color: '#ddd'}}>A boca mais doce da quebrada</Text>
     </View>
   );
 }
@@ -146,7 +132,7 @@ function Sobre() {
   return (
     <View style={styles.section}>
       <Text style={styles.title}>Sobre nós</Text>
-      <Text>
+      <Text style={{color: '#ddd'}}>
         Fundada em 2025, temos como missão proporcionar a melhor experiência
         para os nossos clientes.
       </Text>
@@ -158,7 +144,7 @@ function Servicos() {
   return (
     <View style={styles.section}>
       <Text style={styles.title}>Nossos serviços</Text>
-      <Text>Limpeza de boca</Text>
+      <Text style={{color: '#ddd'}}>Limpeza de boca</Text>
     </View>
   );
 }
@@ -212,7 +198,6 @@ function Contato() {
   );
 }
 
-// Rodapé
 function Footer() {
   return (
     <View style={styles.footer}>
@@ -237,7 +222,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   headerTitle: {
-    color: '#ffffff',
+    color: '#fff',
     fontSize: 26,
     fontWeight: 'bold',
     marginBottom: 10,
@@ -256,7 +241,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   navButtonText: {
-    color: '#ccc',
+    color: '#666',
     fontSize: 16,
   },
   navButtonTextActive: {
@@ -267,14 +252,14 @@ const styles = StyleSheet.create({
     textShadowRadius: 10,
   },
 
-  underlineWrapper: {
+  underline: {
     position: 'absolute',
-    height: 5,
+    height: 4,
     bottom: 0,
-    borderRadius: 5,
+    borderRadius: 2,
     overflow: 'hidden',
   },
-  underlineBase: {
+  underlineBackground: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: '#00f0ff',
     opacity: 0.3,
@@ -284,13 +269,13 @@ const styles = StyleSheet.create({
     top: 0,
     width: '30%',
     height: '100%',
-    borderRadius: 5,
     backgroundColor: '#ffffff',
     opacity: 0.6,
+    borderRadius: 2,
     shadowColor: '#00f0ff',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 12,
+    shadowOpacity: 0.9,
+    shadowRadius: 10,
     elevation: 10,
   },
 
