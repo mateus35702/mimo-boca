@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     overflow: 'hidden',
     transitionProperty: Platform.OS === 'web' ? 'left, width' : undefined,
-    transitionDuration: Platform.OS === 'web' ? '0.4s' : undefined,
+    transitionDuration: Platform.OS === 'web' ? '0.2s' : undefined,
   },
   underlineBackground: {
     ...StyleSheet.absoluteFillObject,
