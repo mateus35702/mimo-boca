@@ -1,84 +1,105 @@
-import React,{useState} from 'react';
-import { SafeAreaView, View, Text,TouchableOpacity, StyleSheet,ScrollView,TextInput,Alert } from 'react-native';
+import React, { useState } from 'react';
+import {
+  SafeAreaView,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  TextInput,
+  Alert,
+} from 'react-native';
 
 export default function App() {
-    const[pagina,setPagina] = useState('home');
-    
-    return(
-        <SafeAreaView style={styles.container}>
-        <Header pagina={pagina} setPagina={setPagina}/>
-        <ScrollView contentContainerStyle={styles.content}>
-          {pagina === 'home' && <Home />}
-          {pagina === 'sobre' && <Sobre />}
-          {pagina === 'contato' && <Contato />}
-          {pagina === 'servicos' && <Servicos />}
-        </ScrollView>
-        <Footer />
-        </SafeAreaView>     
-    );
+  const [pagina, setPagina] = useState('home');
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <Header pagina={pagina} setPagina={setPagina} />
+      <ScrollView contentContainerStyle={styles.content}>
+        {pagina === 'home' && <Home />}
+        {pagina === 'sobre' && <Sobre />}
+        {pagina === 'contato' && <Contato />}
+        {pagina === 'servicos' && <Servicos />}
+      </ScrollView>
+      <Footer />
+    </SafeAreaView>
+  );
 }
 
-
-function Header({pagina,setPagina}){
-  return(
+// NAVBAR MODERNA
+function Header({ pagina, setPagina }) {
+  return (
     <View style={styles.header}>
       <Text style={styles.headerTitle}>Mimo Boca</Text>
       <View style={styles.nav}>
-        {['home','sobre','contato','servicos'].map((p) => (
-          <TouchableOpacity
-          key={p}
-          style={[styles.navButton,pagina === p && styles.navButtonActive]}
-          onPress={()=>setPagina(p)}
-          >
-            <Text style={styles.navButtonText}>{p.charAt(0).toUpperCase() + p.slice(1)}</Text>
-          </TouchableOpacity>
-        ))}
+        {['home', 'sobre', 'contato', 'servicos'].map((p) => {
+          const ativo = pagina === p;
+          return (
+            <TouchableOpacity
+              key={p}
+              onPress={() => setPagina(p)}
+              style={[styles.navButton, ativo && styles.navButtonActive]}
+            >
+              <Text style={[styles.navButtonText, ativo && styles.navButtonTextActive]}>
+                {p.charAt(0).toUpperCase() + p.slice(1)}
+              </Text>
+              {ativo && <View style={styles.activeIndicator} />}
+            </TouchableOpacity>
+          );
+        })}
       </View>
     </View>
   );
 }
 
-function Home(){
-  return(
+// PÁGINAS
+function Home() {
+  return (
     <View style={styles.section}>
       <Text style={styles.title}>Bem-vindo a Mimo Boca</Text>
       <Text>A boca mais doce da quebrada</Text>
     </View>
   );
 }
-function Sobre(){
-  return(
+
+function Sobre() {
+  return (
     <View style={styles.section}>
       <Text style={styles.title}>Sobre nós</Text>
-      <Text>Fundada em 2025, temos como missão proporcionar a melhor experiência para os nossos clientes</Text>
+      <Text>
+        Fundada em 2025, temos como missão proporcionar a melhor experiência para os nossos clientes
+      </Text>
     </View>
   );
 }
-function Servicos(){
-  return(
+
+function Servicos() {
+  return (
     <View style={styles.section}>
       <Text style={styles.title}>Nossos serviços</Text>
       <Text>Limpeza de boca</Text>
-      
     </View>
   );
 }
-function Contato(){
-  const[nome,setNome] = React.useState('');
-  const[email,setEmail] = React.useState('');
-  const[mensagem,setMensagem] = React.useState('');
 
-  function enviar(){
-    if(!nome || !email || !mensagem) {
-      Alert.alert('Erro','Preencha todos os campos');
+function Contato() {
+  const [nome, setNome] = useState('');
+  const [email, setEmail] = useState('');
+  const [mensagem, setMensagem] = useState('');
+
+  function enviar() {
+    if (!nome || !email || !mensagem) {
+      Alert.alert('Erro', 'Preencha todos os campos');
       return;
     }
-    Alert.alert('Mensagem enviada com sucesso',`Obrigado, ${nome}!Retornaremos em breve.`);
+    Alert.alert('Mensagem enviada com sucesso', `Obrigado, ${nome}! Retornaremos em breve.`);
     setNome('');
     setEmail('');
     setMensagem('');
   }
-  return(
+
+  return (
     <View style={styles.section}>
       <Text style={styles.title}>Contato</Text>
       <TextInput
@@ -107,53 +128,83 @@ function Contato(){
     </View>
   );
 }
-function Footer(){
-  return(
+
+// RODAPÉ
+function Footer() {
+  return (
     <View style={styles.footer}>
-      <Text style={{color: 'white'}}>© 2025 Mimo Boca. Todos os direitos reservados.</Text>
+      <Text style={{ color: 'white' }}>© 2025 Mimo Boca. Todos os direitos reservados.</Text>
     </View>
   );
 }
 
+// ESTILOS
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f4f7fa',
   },
+
+  // HEADER MODERNO
   header: {
-    backgroundColor: '#004080',
-    padding: 40,
-    alignItems: 'center',
-    alignContent: 'center',
+    backgroundColor: '#1a1a2e',
+    paddingTop: 50,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 5,
   },
   headerTitle: {
-    color: 'white',
-    fontSize: 24,
+    color: '#ffffff',
+    fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 16,
+    marginBottom: 15,
+    alignSelf: 'center',
   },
   nav: {
     flexDirection: 'row',
-    justifyContent: 'space-around', 
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 10,
   },
   navButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 4,
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    position: 'relative',
   },
   navButtonActive: {
-    backgroundColor: '#0066cc',
+    backgroundColor: '#16213e',
   },
   navButtonText: {
-    color: 'white',
+    color: '#ccc',
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  navButtonTextActive: {
+    color: '#00c6ff',
     fontWeight: 'bold',
   },
+  activeIndicator: {
+    position: 'absolute',
+    bottom: -4,
+    height: 3,
+    width: '100%',
+    backgroundColor: '#00c6ff',
+    borderRadius: 2,
+  },
+
   content: {
     padding: 20,
     flexGrow: 1,
   },
   section: {
- marginBottom: 20,
+    marginBottom: 20,
   },
   title: {
     fontSize: 20,
@@ -167,7 +218,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     paddingHorizontal: 10,
     paddingVertical: 8,
-    marginBottom:15,
+    marginBottom: 15,
   },
   button: {
     backgroundColor: '#004080',
