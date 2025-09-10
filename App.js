@@ -91,7 +91,7 @@ function Header({ pagina, setPagina, underlineAnim, buttonWidth, lightAnim, scre
           ))}
         </View>
 
-        {/* Underline animada responsiva */}
+        {/* Underline animada responsiva, feixe de luz */}
         <Animated.View
           style={[
             styles.underline,
@@ -105,14 +105,20 @@ function Header({ pagina, setPagina, underlineAnim, buttonWidth, lightAnim, scre
             },
           ]}
         >
-          <View style={styles.underlineBackground} />
+          {/* Glow difuso (borda) */}
+          <View style={styles.glow} />
+
+          {/* Feixe central (laser) */}
+          <View style={styles.laser} />
+
+          {/* Feixe animado (movendo) */}
           <Animated.View
             style={[
-              styles.runningLight,
+              styles.laserMoving,
               {
                 left: lightAnim.interpolate({
                   inputRange: [0, 1],
-                  outputRange: ['-30%', '100%'],
+                  outputRange: ['-20%', '100%'],
                 }),
               },
             ]}
@@ -128,7 +134,7 @@ function Home() {
   return (
     <View style={styles.section}>
       <Text style={styles.title}>Bem-vindo a Mimo Boca</Text>
-      <Text style={{color: '#ddd'}}>A boca mais doce da quebrada</Text>
+      <Text style={{ color: '#ddd' }}>A boca mais doce da quebrada</Text>
     </View>
   );
 }
@@ -137,7 +143,7 @@ function Sobre() {
   return (
     <View style={styles.section}>
       <Text style={styles.title}>Sobre nós</Text>
-      <Text style={{color: '#ddd'}}>
+      <Text style={{ color: '#ddd' }}>
         Fundada em 2025, temos como missão proporcionar a melhor experiência
         para os nossos clientes.
       </Text>
@@ -149,7 +155,7 @@ function Servicos() {
   return (
     <View style={styles.section}>
       <Text style={styles.title}>Nossos serviços</Text>
-      <Text style={{color: '#ddd'}}>Limpeza de boca</Text>
+      <Text style={{ color: '#ddd' }}>Limpeza de boca</Text>
     </View>
   );
 }
@@ -229,11 +235,8 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     color: '#fff',
-    fontSize: 30,
+    fontSize: 26,
     fontWeight: 'bold',
-    textShadowColor: '#00f0ff',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 10,
     marginBottom: 10,
     alignSelf: 'center',
   },
@@ -265,31 +268,57 @@ const styles = StyleSheet.create({
 
   underline: {
     position: 'absolute',
-    height: 4,
-    bottom: 0,
-    borderRadius: 2,
-    overflow: 'hidden',
+    height: 12,
+    bottom: -6,
+    borderRadius: 6,
+    overflow: 'visible',
+    justifyContent: 'center',
+    alignItems: 'center',
     transitionProperty: Platform.OS === 'web' ? 'left, width' : undefined,
-    transitionDuration: Platform.OS === 'web' ? '0.2s' : undefined,
+    transitionDuration: Platform.OS === 'web' ? '0.4s' : undefined,
   },
-  underlineBackground: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#00f0ff',
-    opacity: 0.3,
-  },
-  runningLight: {
+  glow: {
     position: 'absolute',
-    top: 0,
-    width: '30%',
-    height: '100%',
-    backgroundColor: '#ffffff',
-    opacity: 0.6,
+    top: 3,
+    left: 0,
+    right: 0,
+    height: 6,
+    borderRadius: 6,
+    backgroundColor: '#00f0ff',
+    opacity: 0.35,
+    shadowColor: '#00f0ff',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  laser: {
+    position: 'absolute',
+    top: 5,
+    left: '10%',
+    width: '80%',
+    height: 2,
     borderRadius: 2,
+    backgroundColor: '#fff',
+    shadowColor: '#00f0ff',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  laserMoving: {
+    position: 'absolute',
+    top: 2,
+    width: '22%',
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#fff',
+    opacity: 0.85,
     shadowColor: '#00f0ff',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.9,
-    shadowRadius: 10,
-    elevation: 10,
+    shadowRadius: 12,
+    elevation: 12,
   },
 
   content: {
