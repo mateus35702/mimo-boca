@@ -9,16 +9,17 @@ import {
   TextInput,
   Alert,
   Animated,
-  Dimensions,
+  useWindowDimensions,
+  Platform,
 } from 'react-native';
 
 const paginas = ['home', 'sobre', 'contato', 'servicos'];
-const screenWidth = Dimensions.get('window').width;
 
 export default function App() {
   const [pagina, setPagina] = useState('home');
   const underlineAnim = useRef(new Animated.Value(0)).current;
   const lightAnim = useRef(new Animated.Value(0)).current;
+  const { width: screenWidth } = useWindowDimensions();
 
   const index = paginas.indexOf(pagina);
   const buttonWidth = screenWidth / paginas.length;
@@ -30,9 +31,9 @@ export default function App() {
       duration: 400,
       useNativeDriver: false,
     }).start();
-  }, [pagina]);
+  }, [pagina, buttonWidth]);
 
-  // Animação loop da luz correndo dentro da underline
+  // Reinicia animação da luz ao redimensionar tela ou trocar aba
   useEffect(() => {
     lightAnim.setValue(0);
     Animated.loop(
@@ -42,7 +43,7 @@ export default function App() {
         useNativeDriver: false,
       })
     ).start();
-  }, []);
+  }, [buttonWidth]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -52,6 +53,7 @@ export default function App() {
         underlineAnim={underlineAnim}
         buttonWidth={buttonWidth}
         lightAnim={lightAnim}
+        screenWidth={screenWidth}
       />
       <ScrollView contentContainerStyle={styles.content}>
         {pagina === 'home' && <Home />}
@@ -64,7 +66,7 @@ export default function App() {
   );
 }
 
-function Header({ pagina, setPagina, underlineAnim, buttonWidth, lightAnim }) {
+function Header({ pagina, setPagina, underlineAnim, buttonWidth, lightAnim, screenWidth }) {
   return (
     <View style={styles.header}>
       <Text style={styles.headerTitle}>Mimo Boca</Text>
@@ -89,7 +91,7 @@ function Header({ pagina, setPagina, underlineAnim, buttonWidth, lightAnim }) {
           ))}
         </View>
 
-        {/* Underline animada correndo entre abas */}
+        {/* Underline animada responsiva */}
         <Animated.View
           style={[
             styles.underline,
@@ -216,6 +218,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0d0d0d',
+    minHeight: '100vh', // Para web!
   },
 
   header: {
@@ -242,10 +245,12 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     paddingVertical: 10,
+    cursor: Platform.OS === 'web' ? 'pointer' : undefined,
   },
   navButtonText: {
     color: '#666',
     fontSize: 16,
+    userSelect: Platform.OS === 'web' ? 'none' : undefined,
   },
   navButtonTextActive: {
     color: '#00f0ff',
@@ -261,6 +266,8 @@ const styles = StyleSheet.create({
     bottom: 0,
     borderRadius: 2,
     overflow: 'hidden',
+    transitionProperty: Platform.OS === 'web' ? 'left, width' : undefined,
+    transitionDuration: Platform.OS === 'web' ? '0.4s' : undefined,
   },
   underlineBackground: {
     ...StyleSheet.absoluteFillObject,
