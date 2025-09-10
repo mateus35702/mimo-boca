@@ -229,8 +229,11 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     color: '#fff',
-    fontSize: 26,
+    fontSize: 30,
     fontWeight: 'bold',
+    textShadowColor: '#00f0ff',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 10,
     marginBottom: 10,
     alignSelf: 'center',
   },
