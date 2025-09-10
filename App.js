@@ -23,16 +23,18 @@ export default function App() {
   const index = paginas.indexOf(pagina);
   const buttonWidth = screenWidth / paginas.length;
 
-  // Move a underline para o botão ativo
+  // Move a underline para o botão ativo, animando o deslocamento
   useEffect(() => {
-    Animated.spring(underlineAnim, {
+    Animated.timing(underlineAnim, {
       toValue: index * buttonWidth,
+      duration: 400,
       useNativeDriver: false,
     }).start();
   }, [pagina]);
 
   // Animação loop da luz correndo dentro da underline
   useEffect(() => {
+    lightAnim.setValue(0);
     Animated.loop(
       Animated.timing(lightAnim, {
         toValue: 1,
@@ -87,20 +89,21 @@ function Header({ pagina, setPagina, underlineAnim, buttonWidth, lightAnim }) {
           ))}
         </View>
 
-        {/* Underline animada */}
+        {/* Underline animada correndo entre abas */}
         <Animated.View
           style={[
             styles.underline,
             {
               width: buttonWidth * 0.8,
-              left: underlineAnim + buttonWidth * 0.1,
+              left: underlineAnim.interpolate({
+                inputRange: [0, screenWidth - buttonWidth],
+                outputRange: [buttonWidth * 0.1, screenWidth - buttonWidth + buttonWidth * 0.1],
+                extrapolate: 'clamp',
+              }),
             },
           ]}
         >
-          {/* Fundo azul translúcido */}
           <View style={styles.underlineBackground} />
-
-          {/* Linha branca correndo */}
           <Animated.View
             style={[
               styles.runningLight,
