@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   SafeAreaView,
   View,
@@ -8,14 +8,51 @@ import {
   ScrollView,
   TextInput,
   Alert,
+  Animated,
+  Dimensions,
 } from 'react-native';
+
+const paginas = ['home', 'sobre', 'contato', 'servicos'];
+const screenWidth = Dimensions.get('window').width;
 
 export default function App() {
   const [pagina, setPagina] = useState('home');
+  const underlineAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const index = paginas.indexOf(pagina);
+  const buttonWidth = screenWidth / paginas.length;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.spring(underlineAnim, {
+        toValue: index * buttonWidth,
+        useNativeDriver: false,
+      }),
+      Animated.sequence([
+        Animated.timing(scaleAnim, {
+          toValue: 1.4,
+          duration: 150,
+          useNativeDriver: false,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 150,
+          useNativeDriver: false,
+        }),
+      ]),
+    ]).start();
+  }, [pagina]);
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header pagina={pagina} setPagina={setPagina} />
+      <Header
+        pagina={pagina}
+        setPagina={setPagina}
+        underlineAnim={underlineAnim}
+        buttonWidth={buttonWidth}
+        scaleAnim={scaleAnim}
+      />
       <ScrollView contentContainerStyle={styles.content}>
         {pagina === 'home' && <Home />}
         {pagina === 'sobre' && <Sobre />}
@@ -27,39 +64,46 @@ export default function App() {
   );
 }
 
-// NAVBAR MODERNA COM SCROLL HORIZONTAL
-function Header({ pagina, setPagina }) {
+function Header({ pagina, setPagina, underlineAnim, buttonWidth, scaleAnim }) {
   return (
     <View style={styles.header}>
       <Text style={styles.headerTitle}>Mimo Boca</Text>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.nav}
-        snapToAlignment="center"
-        decelerationRate="fast"
-      >
-        {['home', 'sobre', 'contato', 'servicos'].map((p) => {
-          const ativo = pagina === p;
-          return (
+      <View style={styles.navWrapper}>
+        <View style={styles.nav}>
+          {paginas.map((p) => (
             <TouchableOpacity
               key={p}
+              style={styles.navButton}
               onPress={() => setPagina(p)}
-              style={[styles.navButton, ativo && styles.navButtonActive]}
+              activeOpacity={0.7}
             >
-              <Text style={[styles.navButtonText, ativo && styles.navButtonTextActive]}>
+              <Text
+                style={[
+                  styles.navButtonText,
+                  pagina === p && styles.navButtonTextActive,
+                ]}
+              >
                 {p.charAt(0).toUpperCase() + p.slice(1)}
               </Text>
-              {ativo && <View style={styles.activeIndicator} />}
             </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
+          ))}
+        </View>
+        <Animated.View
+          style={[
+            styles.underline,
+            {
+              width: buttonWidth * 0.8,
+              left: underlineAnim + buttonWidth * 0.1,
+              transform: [{ scaleX: scaleAnim }],
+            },
+          ]}
+        />
+      </View>
     </View>
   );
 }
 
-// PÁGINAS
+// Páginas
 function Home() {
   return (
     <View style={styles.section}>
@@ -74,8 +118,8 @@ function Sobre() {
     <View style={styles.section}>
       <Text style={styles.title}>Sobre nós</Text>
       <Text>
-        Fundada em 2025, temos como missão proporcionar a melhor experiência para os nossos
-        clientes.
+        Fundada em 2025, temos como missão proporcionar a melhor experiência
+        para os nossos clientes.
       </Text>
     </View>
   );
@@ -100,7 +144,10 @@ function Contato() {
       Alert.alert('Erro', 'Preencha todos os campos');
       return;
     }
-    Alert.alert('Mensagem enviada com sucesso', `Obrigado, ${nome}! Retornaremos em breve.`);
+    Alert.alert(
+      'Mensagem enviada com sucesso',
+      `Obrigado, ${nome}! Retornaremos em breve.`
+    );
     setNome('');
     setEmail('');
     setMensagem('');
@@ -136,76 +183,68 @@ function Contato() {
   );
 }
 
-// RODAPÉ
+// Rodapé
 function Footer() {
   return (
     <View style={styles.footer}>
-      <Text style={{ color: 'white' }}>© 2025 Mimo Boca. Todos os direitos reservados.</Text>
+      <Text style={{ color: 'white' }}>
+        © 2025 Mimo Boca. Todos os direitos reservados.
+      </Text>
     </View>
   );
 }
 
-// ESTILOS
+// Estilos
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f4f7fa',
   },
 
-  // HEADER MODERNO
   header: {
     backgroundColor: '#1a1a2e',
     paddingTop: 50,
-    paddingBottom: 20,
+    paddingBottom: 10,
     paddingHorizontal: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 5,
   },
   headerTitle: {
     color: '#ffffff',
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: 'bold',
-    marginBottom: 15,
+    marginBottom: 10,
     alignSelf: 'center',
   },
-
-  // NAVBAR COM SCROLL
+  navWrapper: {
+    position: 'relative',
+  },
   nav: {
     flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    gap: 12, // se não funcionar, use marginRight nos botões
+    justifyContent: 'space-around',
   },
   navButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    borderRadius: 8,
+    flex: 1,
     alignItems: 'center',
-    position: 'relative',
-    marginRight: 10,
-  },
-  navButtonActive: {
-    backgroundColor: '#16213e',
+    paddingVertical: 10,
   },
   navButtonText: {
     color: '#ccc',
     fontSize: 16,
-    fontWeight: '500',
   },
   navButtonTextActive: {
     color: '#00c6ff',
     fontWeight: 'bold',
   },
-  activeIndicator: {
+  underline: {
     position: 'absolute',
-    bottom: -4,
     height: 3,
-    width: '100%',
+    bottom: 0,
     backgroundColor: '#00c6ff',
     borderRadius: 2,
+    shadowColor: '#00c6ff',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 8,
+    elevation: 8,
   },
 
   content: {
