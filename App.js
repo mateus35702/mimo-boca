@@ -27,12 +27,18 @@ export default function App() {
   );
 }
 
-// NAVBAR MODERNA
+// NAVBAR MODERNA COM SCROLL HORIZONTAL
 function Header({ pagina, setPagina }) {
   return (
     <View style={styles.header}>
       <Text style={styles.headerTitle}>Mimo Boca</Text>
-      <View style={styles.nav}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.nav}
+        snapToAlignment="center"
+        decelerationRate="fast"
+      >
         {['home', 'sobre', 'contato', 'servicos'].map((p) => {
           const ativo = pagina === p;
           return (
@@ -48,7 +54,7 @@ function Header({ pagina, setPagina }) {
             </TouchableOpacity>
           );
         })}
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -68,7 +74,8 @@ function Sobre() {
     <View style={styles.section}>
       <Text style={styles.title}>Sobre nós</Text>
       <Text>
-        Fundada em 2025, temos como missão proporcionar a melhor experiência para os nossos clientes
+        Fundada em 2025, temos como missão proporcionar a melhor experiência para os nossos
+        clientes.
       </Text>
     </View>
   );
@@ -164,12 +171,13 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     alignSelf: 'center',
   },
+
+  // NAVBAR COM SCROLL
   nav: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
     alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: 10,
+    paddingHorizontal: 10,
+    gap: 12, // se não funcionar, use marginRight nos botões
   },
   navButton: {
     paddingVertical: 6,
@@ -177,6 +185,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     position: 'relative',
+    marginRight: 10,
   },
   navButtonActive: {
     backgroundColor: '#16213e',
