@@ -19,8 +19,8 @@ const paginas = ['home', 'sobre', 'contato', 'servicos'];
 // Caminho da imagem para web (coloque logo-mimo-boca.png na pasta public/)
 // Para mobile, coloque ./assets/logo-mimo-boca.png
 const perfilImg = Platform.OS === 'web'
-  ? { uri: '/logo-mimo-boca.png' }
-  : require('./assets/logo-mimo-boca.png');
+  //? { uri: '/logo-mimo-boca.png' }
+  //: require('./assets/logo-mimo-boca.png');
 
 export default function App() {
   const [pagina, setPagina] = useState('home');
