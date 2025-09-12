@@ -11,9 +11,15 @@ import {
   Animated,
   useWindowDimensions,
   Platform,
+  Image,
 } from 'react-native';
 
 const paginas = ['home', 'sobre', 'contato', 'servicos'];
+
+// Imagem de perfil do site (pode ajustar o caminho/local)
+const perfilImg = Platform.OS === 'web'
+  ? '/logo-mimo-boca.png' // Caminho relativo para web
+  : require('./assets/logo-mimo-boca.png'); // Para mobile, coloque a imagem em assets
 
 export default function App() {
   const [pagina, setPagina] = useState('home');
@@ -29,7 +35,6 @@ export default function App() {
     Animated.timing(underlineAnim, {
       toValue: index * buttonWidth,
       duration: 320,
-      // easing: Animated.Easing.inOut(Animated.Easing.ease), // Se quiser suavizar mais
       useNativeDriver: false,
     }).start();
   }, [pagina, buttonWidth]);
@@ -47,6 +52,30 @@ export default function App() {
     return () => loop.stop();
   }, [buttonWidth]);
 
+  // Troca o título da aba conforme a página (web)
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      let titulo;
+      switch (pagina) {
+        case 'home':
+          titulo = 'Mimo Boca - Home';
+          break;
+        case 'sobre':
+          titulo = 'Mimo Boca - Sobre';
+          break;
+        case 'contato':
+          titulo = 'Mimo Boca - Contato';
+          break;
+        case 'servicos':
+          titulo = 'Mimo Boca - Serviços';
+          break;
+        default:
+          titulo = 'Mimo Boca';
+      }
+      document.title = titulo;
+    }
+  }, [pagina]);
+
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -56,6 +85,7 @@ export default function App() {
         buttonWidth={buttonWidth}
         lightAnim={lightAnim}
         screenWidth={screenWidth}
+        perfilImg={perfilImg}
       />
       <ScrollView contentContainerStyle={styles.content}>
         {pagina === 'home' && <Home />}
@@ -68,10 +98,17 @@ export default function App() {
   );
 }
 
-function Header({ pagina, setPagina, underlineAnim, buttonWidth, lightAnim, screenWidth }) {
+function Header({ pagina, setPagina, underlineAnim, buttonWidth, lightAnim, screenWidth, perfilImg }) {
   return (
     <View style={styles.header}>
-      <Text style={styles.headerTitle}>Mimo Boca</Text>
+      <View style={styles.headerRow}>
+        <Image
+          source={perfilImg}
+          style={styles.headerLogo}
+          resizeMode="contain"
+        />
+        <Text style={styles.headerTitle}>Mimo Boca</Text>
+      </View>
       <View style={styles.navWrapper}>
         <View style={styles.nav}>
           {paginas.map((p) => (
@@ -92,7 +129,6 @@ function Header({ pagina, setPagina, underlineAnim, buttonWidth, lightAnim, scre
             </TouchableOpacity>
           ))}
         </View>
-
         {/* Underline animada responsiva, feixe de luz */}
         <Animated.View
           style={[
@@ -109,10 +145,8 @@ function Header({ pagina, setPagina, underlineAnim, buttonWidth, lightAnim, scre
         >
           {/* Glow difuso (borda) */}
           <View style={styles.glow} />
-
           {/* Feixe central (laser) */}
           <View style={styles.laser} />
-
           {/* Feixe animado (movendo) */}
           <Animated.View
             style={[
@@ -120,7 +154,7 @@ function Header({ pagina, setPagina, underlineAnim, buttonWidth, lightAnim, scre
               {
                 left: lightAnim.interpolate({
                   inputRange: [0, 1],
-                  outputRange: ['2%', '78%'], // Mantém dentro do botão
+                  outputRange: ['2%', '78%'],
                 }),
               },
             ]}
@@ -131,7 +165,6 @@ function Header({ pagina, setPagina, underlineAnim, buttonWidth, lightAnim, scre
   );
 }
 
-// Páginas
 function Home() {
   return (
     <View style={styles.section}>
@@ -221,26 +254,35 @@ function Footer() {
   );
 }
 
-// Estilos
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#23233a', // Mais claro que antes
-    minHeight: '100vh', // Para web!
+    backgroundColor: '#23233a',
+    minHeight: '100vh',
   },
-
   header: {
     backgroundColor: '#1a1a2e',
     paddingTop: 50,
     paddingBottom: 10,
     paddingHorizontal: 20,
   },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  headerLogo: {
+    width: 38,
+    height: 38,
+    marginRight: 12,
+    borderRadius: 8,
+    backgroundColor: '#fff',
+  },
   headerTitle: {
     color: '#fff',
     fontSize: 26,
     fontWeight: 'bold',
-    marginBottom: 10,
-    alignSelf: 'center',
   },
   navWrapper: {
     position: 'relative',
@@ -261,13 +303,12 @@ const styles = StyleSheet.create({
     userSelect: Platform.OS === 'web' ? 'none' : undefined,
   },
   navButtonTextActive: {
-    color: '#ff2d2d', // Vermelho para ativo
+    color: '#ff2d2d',
     fontWeight: 'bold',
     textShadowColor: '#ff2d2d',
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 10,
   },
-
   underline: {
     position: 'absolute',
     height: 12,
@@ -286,7 +327,7 @@ const styles = StyleSheet.create({
     right: 0,
     height: 6,
     borderRadius: 6,
-    backgroundColor: '#ff2d2d', // Vermelho
+    backgroundColor: '#ff2d2d',
     opacity: 0.35,
     shadowColor: '#ff2d2d',
     shadowOffset: { width: 0, height: 0 },
@@ -302,7 +343,7 @@ const styles = StyleSheet.create({
     height: 2,
     borderRadius: 2,
     backgroundColor: '#fff',
-    shadowColor: '#ff2d2d', // Vermelho
+    shadowColor: '#ff2d2d',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 1,
     shadowRadius: 12,
@@ -314,7 +355,7 @@ const styles = StyleSheet.create({
     width: '22%',
     height: 4,
     borderRadius: 2,
-    backgroundColor: '#ff2d2d', // Vermelho
+    backgroundColor: '#ff2d2d',
     opacity: 0.85,
     shadowColor: '#ff2d2d',
     shadowOffset: { width: 0, height: 0 },
@@ -322,7 +363,6 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 12,
   },
-
   content: {
     padding: 20,
     flexGrow: 1,
