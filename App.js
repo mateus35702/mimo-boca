@@ -28,21 +28,23 @@ export default function App() {
   useEffect(() => {
     Animated.timing(underlineAnim, {
       toValue: index * buttonWidth,
-      duration: 400,
+      duration: 320,
+      // easing: Animated.Easing.inOut(Animated.Easing.ease), // Se quiser suavizar mais
       useNativeDriver: false,
     }).start();
   }, [pagina, buttonWidth]);
 
-  // Reinicia animação da luz ao redimensionar tela ou trocar aba
+  // Loop contínuo do laser, sem reset abrupto
   useEffect(() => {
-    lightAnim.setValue(0);
-    Animated.loop(
+    const loop = Animated.loop(
       Animated.timing(lightAnim, {
         toValue: 1,
-        duration: 1500,
+        duration: 1400,
         useNativeDriver: false,
       })
-    ).start();
+    );
+    loop.start();
+    return () => loop.stop();
   }, [buttonWidth]);
 
   return (
@@ -118,7 +120,7 @@ function Header({ pagina, setPagina, underlineAnim, buttonWidth, lightAnim, scre
               {
                 left: lightAnim.interpolate({
                   inputRange: [0, 1],
-                  outputRange: ['-20%', '100%'],
+                  outputRange: ['2%', '78%'], // Mantém dentro do botão
                 }),
               },
             ]}
@@ -223,7 +225,7 @@ function Footer() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0d0d0d',
+    backgroundColor: '#23233a', // Mais claro que antes
     minHeight: '100vh', // Para web!
   },
 
@@ -259,9 +261,9 @@ const styles = StyleSheet.create({
     userSelect: Platform.OS === 'web' ? 'none' : undefined,
   },
   navButtonTextActive: {
-    color: '#00f0ff',
+    color: '#ff2d2d', // Vermelho para ativo
     fontWeight: 'bold',
-    textShadowColor: '#00f0ff',
+    textShadowColor: '#ff2d2d',
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 10,
   },
@@ -284,9 +286,9 @@ const styles = StyleSheet.create({
     right: 0,
     height: 6,
     borderRadius: 6,
-    backgroundColor: '#00f0ff',
+    backgroundColor: '#ff2d2d', // Vermelho
     opacity: 0.35,
-    shadowColor: '#00f0ff',
+    shadowColor: '#ff2d2d',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.8,
     shadowRadius: 20,
@@ -300,7 +302,7 @@ const styles = StyleSheet.create({
     height: 2,
     borderRadius: 2,
     backgroundColor: '#fff',
-    shadowColor: '#00f0ff',
+    shadowColor: '#ff2d2d', // Vermelho
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 1,
     shadowRadius: 12,
@@ -312,9 +314,9 @@ const styles = StyleSheet.create({
     width: '22%',
     height: 4,
     borderRadius: 2,
-    backgroundColor: '#fff',
+    backgroundColor: '#ff2d2d', // Vermelho
     opacity: 0.85,
-    shadowColor: '#00f0ff',
+    shadowColor: '#ff2d2d',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.9,
     shadowRadius: 12,
@@ -344,7 +346,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   button: {
-    backgroundColor: '#004080',
+    backgroundColor: '#ff2d2d',
     paddingVertical: 8,
     borderRadius: 6,
     alignItems: 'center',
