@@ -16,10 +16,11 @@ import {
 
 const paginas = ['home', 'sobre', 'contato', 'servicos'];
 
-// Imagem de perfil do site (pode ajustar o caminho/local)
+// Caminho da imagem para web (coloque logo-mimo-boca.png na pasta public/)
+// Para mobile, coloque ./assets/logo-mimo-boca.png
 const perfilImg = Platform.OS === 'web'
-  ? '/logo-mimo-boca.png' // Caminho relativo para web
-  : require('./assets/logo-mimo-boca.png'); // Para mobile, coloque a imagem em assets
+  ? { uri: '/logo-mimo-boca.png' }
+  : require('./assets/logo-mimo-boca.png');
 
 export default function App() {
   const [pagina, setPagina] = useState('home');
@@ -30,7 +31,6 @@ export default function App() {
   const index = paginas.indexOf(pagina);
   const buttonWidth = screenWidth / paginas.length;
 
-  // Move a underline para o botão ativo, animando o deslocamento
   useEffect(() => {
     Animated.timing(underlineAnim, {
       toValue: index * buttonWidth,
@@ -39,7 +39,6 @@ export default function App() {
     }).start();
   }, [pagina, buttonWidth]);
 
-  // Loop contínuo do laser, sem reset abrupto
   useEffect(() => {
     const loop = Animated.loop(
       Animated.timing(lightAnim, {
@@ -129,7 +128,6 @@ function Header({ pagina, setPagina, underlineAnim, buttonWidth, lightAnim, scre
             </TouchableOpacity>
           ))}
         </View>
-        {/* Underline animada responsiva, feixe de luz */}
         <Animated.View
           style={[
             styles.underline,
@@ -143,11 +141,8 @@ function Header({ pagina, setPagina, underlineAnim, buttonWidth, lightAnim, scre
             },
           ]}
         >
-          {/* Glow difuso (borda) */}
           <View style={styles.glow} />
-          {/* Feixe central (laser) */}
           <View style={styles.laser} />
-          {/* Feixe animado (movendo) */}
           <Animated.View
             style={[
               styles.laserMoving,
