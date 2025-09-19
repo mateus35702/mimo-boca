@@ -16,11 +16,23 @@ import {
 
 const paginas = ['home', 'sobre', 'contato', 'servicos'];
 
-// Caminho da imagem para web (coloque logo-mimo-boca.png na pasta public/)
-// Para mobile, coloque ./assets/logo-mimo-boca.png
-const perfilImg = Platform.OS === 'web'
-  //? { uri: '/logo-mimo-boca.png' }
-  //: require('./assets/logo-mimo-boca.png');
+// Configuração da imagem de perfil
+const getPerfilImg = () => {
+  try {
+    if (Platform.OS === 'web') {
+      // Para web, usa o caminho relativo para a pasta assets
+      return { uri: 'assets/logo-mimo-boca.png' };
+    } else {
+      // Para mobile, usa require com o caminho relativo
+      return require('./assets/logo-mimo-boca.png');
+    }
+  } catch (error) {
+    console.error('Erro ao carregar a imagem:', error);
+    return null;
+  }
+};
+
+const perfilImg = getPerfilImg();
 
 export default function App() {
   const [pagina, setPagina] = useState('home');
@@ -101,11 +113,16 @@ function Header({ pagina, setPagina, underlineAnim, buttonWidth, lightAnim, scre
   return (
     <View style={styles.header}>
       <View style={styles.headerRow}>
-        <Image
-          source={perfilImg}
-          style={styles.headerLogo}
-          resizeMode="contain"
-        />
+        <View style={styles.headerLogoContainer}>
+          {perfilImg && (
+            <Image
+              source={perfilImg}
+              style={styles.headerLogo}
+              resizeMode="contain"
+              onError={(error) => console.log('Erro ao carregar a imagem:', error.nativeEvent?.error || error)}
+            />
+          )}
+        </View>
         <Text style={styles.headerTitle}>Mimo Boca</Text>
       </View>
       <View style={styles.navWrapper}>
@@ -243,7 +260,7 @@ function Footer() {
   return (
     <View style={styles.footer}>
       <Text style={{ color: 'white' }}>
-        © 2025 Mimo Boca. Todos os direitos reservados.
+        2025 Mimo Boca. Todos os direitos reservados.
       </Text>
     </View>
   );
@@ -267,10 +284,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 10,
   },
+  headerLogoContainer: {
+    width: 50,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 25,
+    marginRight: 10,
+  },
   headerLogo: {
     width: 38,
     height: 38,
-    marginRight: 12,
     borderRadius: 8,
     backgroundColor: '#fff',
   },
